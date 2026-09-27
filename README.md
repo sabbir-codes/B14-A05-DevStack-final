@@ -14,7 +14,7 @@ running "stack" panel that stays visible as you scroll.
 
 ## Built with
 
-- React 18 + Vite
+- React 19 + Vite
 - Tailwind CSS
 - react-toastify
 - JSON (local data source, loaded via `useEffect`, not hardcoded)
