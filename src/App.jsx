@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import Navbar from "./components/Navbar.jsx";
 import Hero from "./components/Hero.jsx";
@@ -6,22 +6,20 @@ import TechGrid from "./components/TechGrid.jsx";
 import StackSidebar from "./components/StackSidebar.jsx";
 import Loading from "./components/Loading.jsx";
 import Footer from "./components/Footer.jsx";
-import technologiesData from "./data/technologies.json";
+const techs = async () => {
+  const res = await fetch('/technologies.json')
+  const data = await res.json();
+  return data;
+}
+
 
 export default function App() {
-  const [technologies, setTechnologies] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [stack, setStack] = useState([]);
 
   // Simulates fetching the JSON data (it's a local import, so this resolves
   // almost instantly — but the loading state still exists and is exercised).
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTechnologies(technologiesData);
-      setLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, []);
+
+  
 
   const stackIds = useMemo(() => new Set(stack.map((t) => t.id)), [stack]);
 
@@ -43,6 +41,7 @@ export default function App() {
     setStack([]);
     toast.info("Stack cleared.");
   }
+ console.log(techs());
 
   return (
     <div className="min-h-screen bg-white text-ink">
@@ -59,14 +58,13 @@ export default function App() {
           </p>
         </div>
 
-        {loading ? (
-          <Loading />
-        ) : (
+       
           <div className="grid lg:grid-cols-[1fr_320px] gap-8 items-start">
-            <TechGrid technologies={technologies} stackIds={stackIds} onAdd={handleAdd} />
+            <Suspense fallback={<p>Loading...</p>}>
+            <TechGrid technologies={techs()} stackIds={stackIds} onAdd={handleAdd} />
+            </Suspense>
             <StackSidebar stack={stack} onRemove={handleRemove} onRemoveAll={handleRemoveAll} />
           </div>
-        )}
       </section>
 
       <Footer />
